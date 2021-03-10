@@ -1,0 +1,98 @@
+\chapter{Linear Separators \& Convex Hulls}
+
+\section{Linear Separability}
+\textbf{Definition 1:} Two sets G and B of points in ${\rm I\!R}^{n}$ are said to be \textbf{linearly separable} if there is a hyperplane l such that all points in G lie to one side of l, while all points in B lie to the other side of l.
+
+\vspace{0.4cm}
+where l is:
+\begin{itemize}
+    \item in ${\rm I\!R^{2}}$, $ax + by = c$
+    \item in ${\rm I\!R^{3}}$, $ax + by + cz = d$
+    \item in ${\rm I\!R^{n}}$, $a_{1}x_{1} + a_{2}x_{2} + ... a_{n}x_{n} = b$ or $\sum_{i = 1}^{n} a_{i}x_{i} = b$ 
+    \vspace{0.3cm}
+    or $<a, x> = b$, where a = ($a_{1}, a_{2}, ...a_{n}$) \& x = ($x_{1}, x_{2}, ...x_{n}$). \textbf{a is perpendicular to l}.
+\end{itemize}
+
+\begin{itemize}
+    \item[$\xrightarrow{}$] On one side of hyperplane l, $<a, x> > b$, while on the other side of l, $<a, x> < b$.
+\end{itemize}
+
+\textbf{Definition 2:} Two sets G and B of points in ${\rm I\!R}^{n}$ are said to be \textbf{linearly separable} if there is a vector $a \in {\rm I\!R}^{n}$ and a scalar $b \in {\rm I\!R}^{n}$ s.t.
+\begin{enumerate}
+    \item $\forall x \in G, <a,x> > b$, and
+    \item $\forall x \in B, <a,x> < b$
+\end{enumerate}
+Here, the hyperplane defined by $<a,x> = b$ is called the \textbf{separating hyperplane}.
+
+\vspace{0.5cm}
+\textbf{Definition 3:} A set $S \subseteq {\rm I\!R}^{n}$ is said to be a \textbf{convex set} if for every two points $x, y \in S$, the entire line segment connecting x and y  is inside S.
+
+\vspace{0.5cm}
+\textbf{Definition 4:} $S \subseteq {\rm I\!R}^{n}$ is said to be a \textbf{convex set} if for every two points $x, y \in S$ and $\forall \alpha \in [0, 1]$, $z = {\alpha}x + (1 - \alpha)y \in S$.
+
+\vspace{0.5cm}
+\textbf{Definition 5:} For a set $G \subseteq {\rm I\!R}^{n}$, the \textbf{convex hull} of G is the smallest (minimal) convex set containing all the points of G. In the rubber band, pin example, the convex hull is represented by the rubber band boundary.
+
+\vspace{0.5cm}
+\textbf{Definition 6:} \textbf{Convex Hull} is a set $H_{G} \subseteq  {\rm I\!R}^{n}$ s.t.
+\begin{enumerate}
+    \item $G \subseteq H_{G}$
+    \item $H_{G}$ is convex
+    \item No convex proper subset of $H_{G}$ contains all of G.
+\end{enumerate}
+
+\vspace{0.5cm}
+\textbf{Theorm 2.1:} Two sets of points $G, B \subseteq {\rm I\!R}^{n}$ are linearly separable if and only if their convex hulls are disjoint. i.e. $H_{G} \cap H_{B} = \phi$.
+
+
+\vspace{0.5cm}
+\textbf{Proof:} $H_{G} \cap H_{B} = \phi \implies \exists (a,b)$ s.t. $\forall x \in G, <a,x> > b$ and $\forall x \in B, <a,x> < b$.
+
+We will try to find out smallest vector $a$ which is connecting $H_{G}$ to $H_{B}$, which appears to be normal to $l$ (if it exists).
+
+So, a = the smallest vector in the set \{$x - y: x \in H_{G}, y \in H_{B}$\}
+
+$\forall x \in G \cup B$, compute $<a,x>$. The values of $<a,x>$ for $x \in G$ are close to each other and separate from those of $x \in B$.
+
+\begin{figure}[!h]
+\centering
+ \includegraphics[width=0.15\textwidth]{2.0.png}
+ \end{figure}
+
+\vspace{0.5cm}
+\textbf{Claim:} $\forall x \in G, \forall x \in B$, we have
+\begin{itemize}
+    \item[$\xrightarrow{}$] $<x-y,a> \geq {||a||}^{2}$
+    \item[$\xrightarrow{}$] $<x,a> - <y,a> \geq {||a||}^{2}$
+\end{itemize}
+
+\textbf{Observation:} $D = H_{G} - H_{B}$ is convex set. \textbf{(Proof exercise)}
+
+\vspace{0.5cm}
+\textbf{Proof of Claim:} If a is the smallest vector in convex set D, then $\forall z \in D$, 
+
+ \begin{figure}[!h]
+\centering
+ \includegraphics[width=0.15\textwidth]{2.1.png}
+ \end{figure}
+
+\textbf{Part 1:} $<z,a> >= {||a||}^{2}/2$
+
+let $r$ be a point in line segment a to z.
+i.e. $r = \alpha{z} + (1 - \alpha){a} \in D$
+
+since $a$ is closer to origin, ${||a||}^{2} <= {||r||}^{2}$
+
+$= {(\alpha{z} + (1 - \alpha)a)}^{2}$
+
+$= {\alpha}^{2}{{||z||}^{2}} + {(1 -\alpha)}^{2}{{||a||}^{2}} + 2{\alpha}{(1 - \alpha)}{<z,a>}$
+
+$<z,a>  >=  ({||a||^2 - (1 - \alpha)^2{||a||^2} - {\alpha}^2{||{z}^2||}) / 2{\alpha}(1 - \alpha) }$
+
+$= ((2 - \alpha){{||a||}^2} - \alpha{||z||}^2) / 2(1 - \alpha)$, since a!=0
+
+$>= ((2 - \alpha){{||a||}^2} - {||a||}^2) / 2(1 - \alpha)$, since $- \alpha{||z||}^2 >= - {||a||}^2$, hence $\alpha <= {||a||^2}/{||z||^2}$
+
+$= {||a||^2} / 2$
+
+Now, if we choose $\alpha <= (1/2)({||a||^2}/{||z||^2})$, we get <z,a>  >= $= {||a||^2}$

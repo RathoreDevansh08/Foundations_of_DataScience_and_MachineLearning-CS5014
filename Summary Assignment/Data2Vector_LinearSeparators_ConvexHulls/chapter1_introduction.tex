@@ -1,0 +1,31 @@
+\chapter{Data to Vectors}
+\pagenumbering{arabic}\hspace{3mm}
+\section{How to convert data to vector?}
+\begin{itemize}
+    \item[$\xrightarrow{}$] Unstructured data $ \xrightarrow{} {\rm I\!R}^{n} $, where n is the number of parameters.
+    \item[$\xrightarrow{}$] Example: Image of Dimensions (n x m x 3) with Pixel(i, j, k) $\in$ ${\rm I\!R}^{n.m.3}$
+    \item[$\xrightarrow{}$] Example: graph $\xrightarrow{}$ adjacency matrix can also be seen as vectorization of graph data.
+    \item[$\xrightarrow{}$] Web Page Text Example: If the words of dictionary can be represented as ($w_{1}, w_{2}, ... w_{n}$). Let $x_{i}$ represent the frequency of word $w_{i}$ in the given text, then the \textbf{word frequency vector} can be represented as ($x_{1}, x_{2}, ...x_{n}$).
+    \item[$\xrightarrow{}$] Lesser the distance between two different vectors, more is the similarity between their respective data points.
+    \item[$\xrightarrow{}$] Typical ways in which a vector representation for a dataset is selected $\xrightarrow{}$
+    \begin{enumerate}
+        \item Domain Expert Driven - \textbf{Cepstral coefficient}
+        \item Don't Care - Choose any possible way. eg. in CNN, NN, etc.
+        \item Algo. Assisted - use Machine Learning Algorithms to find best suitable vector representation. eg. word2vec.
+    \end{enumerate}
+\end{itemize}
+
+\section{Why to convert data to vector?}
+Vector allows different applications such as -
+\begin{itemize}
+    \item[$\xrightarrow{}$] Distance - similarity
+    \item[$\xrightarrow{}$] Angle / Innerproduct
+    \item[$\xrightarrow{}$] Separators (linear / non-linear) - eg. email spam classifier
+    \item[$\xrightarrow{}$] Geometry (Hulls / Boxes)
+    \item[$\xrightarrow{}$] Subspaces
+    \item[$\xrightarrow{}$] Algebra - eg. addition of vectors
+    \item[$\xrightarrow{}$] Limits
+    \item[$\xrightarrow{}$] Topology
+\end{itemize}
+
+

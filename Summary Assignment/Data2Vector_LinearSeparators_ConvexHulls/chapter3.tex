@@ -1,0 +1,26 @@
+
+\chapter{System Architecture}
+\includegraphics[width=16cm]{images/arch.png}
+
+
+\section{Key components}
+\begin{enumerate}
+    \item Two-way communication socket: carries out all the transactions between the server and the clients, through a TCP port available.
+    \item Server Daemon : Initiates a wait loop to accept responses from clients (IDEs), and if a request is received, it spawns a thread corresponding to the request type (hover, autocomplete).
+    \item Client: IDEs as clients send request to the server through the two-way communication socket, receives back json encoded response, decodes it, and performs the operation that was requested for.
+    \item Hovering Process Module: Upon being requested, it runs the hover module and returns json encoded response generated, to the client via communication socket.
+    \item Autocomplete Processing Module: Receives a string whose possible list of suffixes are to be returned in json format through the communication socket, to the client.
+    
+    \item We used StandardML’s Socket library and an extension of SML known as ConcurrentML (CML) to implement concurrency and handle sockets.
+\begin{itemize}
+    \item \textbf{Sockets:}
+	Sockets are basically the end points of any communication channel for sending and receiving messages. Each Socket is associated with a specific socket address. A stream socket provides a sequenced and unique flow of data. It notifies the sender whether or not the message was sent to the intended receiver, successfully. Binding is a process that is used for associating a socket with a socket address.
+	\item \textbf{Concurrent ML (CML):}
+CML or Concurrent ML is a high performing language used for concurrent programming, which is an extension of Standard ML language, and is built on top of SML/NJ. It consists of multiple threads, which use synchronous message passing on typed channels to communicate and synchronize. When a thread wants to communicate on a channel, it must rendezvous with another thread that wants to do a complementary communication on same channel.
+\end{itemize}
+
+
+
+\end{enumerate}
+
+

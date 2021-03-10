@@ -1,0 +1,34 @@
+\chapter{Conclusion and Future Work}
+
+\section{Conclusion}
+\begin{enumerate}
+    \item Basic, efficient and scalable Language Server that conforms to LSP 3.14
+    \item System Architecture is asynchronous in nature as separate threads are spawned to deduce the type of a request and to handle each request’s response. The main thread listens to the socket for incoming requests.
+    \item Uses sockets for communication which can work even if Language server and client are on different machines. Thus, the ground architecture is distributed.
+    \item Language users can use this language server to build a plugin for a specific IDE that supports LSP
+\end{enumerate}
+
+\section{Potential Improvements}
+\begin{itemize}
+    \item Du file generation is slow and a du-file is huge and occupies a lot of space with around 70k - 110k lines depending on the use of library functions
+\\
+
+\includegraphics[width=16cm]{images/mlton-time.png} \\
+\\
+
+\includegraphics[width=16cm]{images/created-du-files.png} \\
+    \item 	An idea that we had explored is to use the compiler’s/interpreter’s internal modules to get useful semantics. 
+	However, we decided to proceed with du-files because of the exhaustive nature of information they provide and simplicity in producing the same.
+	\begin{enumerate}
+	    \item  
+Closely analysing a du-file reveals that most of the space occupied by the du-file consists of information about functions, types, file paths etc present in library functions, which are constant for a release of MLton / SML/NJ. 
+\item 
+Note that we still require the occurrences of library functions used in a user’s project files which are still needed from the du file currently (even if someone proposes to precompute du-file information of library functions).
+\item 
+If a method is devised to read only the modified parts from a du-file instead of reading the entire file and recomputing all the Ordered Maps and Trie data structures, the current implementation can be made more efficient.
+
+
+	\end{enumerate}
+\end{itemize}
+
+

@@ -1,0 +1,152 @@
+\documentclass[a4paper, 12pt]{article}
+
+%%% Meta data
+
+	\title{Linear Algebraic Methods in Combinatorics}
+ 
+	\usepackage{authblk}
+	\author{
+		Your~Name\\
+		Roll~Number
+	}
+	\affil{
+		Computer Science \& Engineering\\
+		Indian Institute of Technology Palakkad
+	}
+
+
+%%% Page formatting
+
+	\usepackage[margin=2cm]{geometry}
+	
+	\usepackage{hyperref}
+	\hypersetup{colorlinks=false,linkcolor=red,citecolor=red,pdfborder={0 0 0}}
+
+	\renewcommand{\arraystretch}{1.5}
+
+% Math 
+	\usepackage{amsmath,amsthm, amssymb}
+
+	% Theorem environments
+	\newtheorem{theorem}{Theorem}
+	\newtheorem{corollary}[theorem]{Corollary}
+	\newtheorem{lemma}[theorem]{Lemma}
+	\newtheorem{proposition}[theorem]{Proposition}
+	\newtheorem{conjecture}[theorem]{Conjecture}
+	\newtheorem{observation}[theorem]{Conjecture}
+
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definition}
+	\newtheorem{question}[theorem]{Question}
+
+	\theoremstyle{remark}
+	\newtheorem*{remark}{Remark}
+	
+	% Shorthands
+	\def\bbN{\mathbb{N}}
+	\def\bbZ{\mathbb{Z}}
+	\def\bbQ{\mathbb{Q}}
+	\def\bbR{\mathbb{R}}
+	\def\bbF{\mathbb{F}}
+
+	\def\tends{\rightarrow}
+	\def\into{\rightarrow}
+	\def\implies{\Rightarrow}
+	\def\half{\frac{1}{2}}
+	\def\quarter{\frac{1}{4}}
+	
+	\newcommand{\set}[1]{\left\{ #1 \right\}}
+	\newcommand{\norm}[1]{\left\Vert #1 \right\Vert}
+	\newcommand{\card}[1]{\left\vert #1 \right\vert}
+	\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+	\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+Summarise the article in three or four sentences. Though it appears at the top
+of the article, it is better to write it after the rest of the article is
+completed.
+
+\end{abstract}
+
+\section{Introduction}
+
+Give a basic overview of the method in two or three paragraphs. 
+
+\subsection{Preliminaries}
+
+You can recall/state any basic linear algebraic terms and results (with out
+proofs) that is frequently used in the article.
+
+\begin{definition}
+\label{defnVectorSpace}
+	A \emph{vector space} over a field $\bbF$ is a set $V$ together with
+	two operations $+ : V \times V \into V$, called \emph{vector addition},
+	and $\cdot : \bbF \times V \into V$, called \emph{scalar addition} which
+	satisfies the following axioms:
+	\begin{enumerate}
+	\item 
+		$\forall u, v, w \in V,~ (u + v) + w = u + (v + w)$ 
+		(Associativity of $+$), 
+	\item 
+		$\forall u, v \in V,~ u + v = v + u$ 
+		(Commutativity of $+$), 
+	\item
+		There exists $0 \in V$ such that $\forall v \in V,~ v + 0 = v$
+		(Identity for $+$)
+	\item
+		(Inverse for $+$)
+	\item
+		$\forall a, b \in \bbF, \forall v \in V,~ 
+		a \cdot (b \cdot v) = (ab) \cdot v$
+		(Compatibility of $\cdot$ and $\bbF$-multiplication)
+	\item
+		$\forall v \in V,~ 1 \cdot v = v$, where $1$ is the multiplicative 
+		identity in $\bbF$
+		(Identity for $\cdot$)	
+	\item
+		(Distributivity of $\cdot$ over $+$)
+	\item
+		(Distributivity of $\cdot$ over $\bbF$-addition)
+	\end{enumerate}
+\end{definition}
+
+\begin{definition}
+\label{defnLinInd}
+	A set $S$ of vectors in a vector space is called \emph{linearly
+	independent} if
+	\[
+	\sum_{v \in V} \lambda_v v = 0 \implies \forall v~ \lambda_v = 0.
+	\]
+
+\end{definition}
+
+\begin{definition}
+\label{defnDimension}
+	The \emph{dimension} of a vector space is the maximum size of a set of
+	linearly independent vectors in the space.
+\end{definition}
+
+\begin{theorem}
+The number or linearly independent rows in any matrix is same as the
+number of linearly independent columns in that matrix.
+\end{theorem}
+
+\section{Examples}
+
+Give two or three example applications of the linear algebraic method. You can
+either work out the examples formally or describe the idea behind the solution
+in English.
+
+\subsection{Example 1}
+
+\subsection{Example 2}
+
+\section{Difficulties}
+
+Describe the ideas which you found difficult.
+
+\end{document}

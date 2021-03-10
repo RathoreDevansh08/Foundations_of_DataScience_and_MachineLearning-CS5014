@@ -1,0 +1,299 @@
+\chapter{Implementation}
+
+\section{Language Specific Information}
+
+StandardML is a strongly-typed functional programming language. Along with strict type checking at compile time, it is a language which supports nested functions.
+\begin{verbatim}
+fun myfun x y = x + y
+
+(* x : int, y : int
+myfun : int -> int -> int *)
+fun another  v = 
+      let
+         fun myfun x y = x * y
+         (* shadows myfun above *)
+      in
+         myfun v 2
+      end
+
+\end{verbatim}
+
+Here, in the code snippet above, ‘myfun’ defined in ‘another’ function is a different symbol (with different semantics and scope) from ‘myfun’ defined above the function ‘another’.
+
+MLton, a popular compiler for SML, provides a way to capture the type of token (whether it is a structure, functor, signature, variable, exception etc.), its location (to be precise, the file path, line number and column number of the first character of the token at the location of its definition), its type (for example, myfun’s type is int -> int -> int) and all occurrences.
+This is the information precisely needed by a language server to handle requests that require a language specific response.
+
+The mechanism provided by MLton is called a du-file, which can be generated from the .mlb file of a project.
+
+To run a project consisting of numerous files, MLton needs to be provided with a .mlb file which includes other .mlb/.sml/.sig files in the correct order of dependency (topological order) - for each file, the library functions and other project .mlb/.sml files that the current file depends upon should be listed strictly above it in the .mlb file.
+
+An example .mlb file is as follows -
+\begin{verbatim}
+$(SML_LIB)/basis/basis.mlb
+$(SML_LIB)/cml/cml.mlb
+$(SML_LIB)/smlnj-lib/INet/inet-lib.mlb
+$(SML_LIB)/smlnj-lib/Unix/unix-lib.mlb
+test.sml
+
+\end{verbatim}
+
+This project uses the Basis library (SML’s core library functions), CML (ConcurrentML), INet and Unix specific structures and finally, the user-defined file `test.sml`.
+
+.mlb files can further contain other .mlb and .sml/.sig files.
+For the curious, an MLton-defined .mlb file looks as follows - **
+\begin{verbatim}
+ann
+   "sequenceNonUnit warn"
+   "nonexhaustiveMatch warn" "redundantMatch warn"
+   "warnUnused true"
+in
+   local
+  	$(SML_LIB)/basis/basis.mlb
+  	../core-cml/core-cml.mlb
+  	multicast.sig
+  	multicast.sml
+  	simple-rpc.sig
+  	simple-rpc.sml
+   in
+  	signature MULTICAST
+  	structure Multicast
+
+  	signature SIMPLE_RPC
+  	structure SimpleRPC
+   end
+end
+\end{verbatim}
+
+
+** defined in /usr/lib/mlton/sml/cml/cml-lb/cml-lib.mlb on Ubuntu
+ 
+Initial part of an example .du file is as follows -
+
+\begin{verbatim}
+variable myfun /home/shruti/oelp-lsp/test/test.sml 1.5 "int -> int -> int"
+variable x /home/shruti/oelp-lsp/test/test.sml 1.11 "int"
+	/home/shruti/oelp-lsp/test/test.sml 1.17
+variable y /home/shruti/oelp-lsp/test/test.sml 1.13 "int"
+	/home/shruti/oelp-lsp/test/test.sml 1.21
+variable another /home/shruti/oelp-lsp/test/test.sml 2.5 "int -> int"
+variable v /home/shruti/oelp-lsp/test/test.sml 2.14 "int"
+	/home/shruti/oelp-lsp/test/test.sml 5.25
+variable myfun /home/shruti/oelp-lsp/test/test.sml 3.23 "int -> int -> int"
+	/home/shruti/oelp-lsp/test/test.sml 5.19
+variable x /home/shruti/oelp-lsp/test/test.sml 3.29 "int"
+	/home/shruti/oelp-lsp/test/test.sml 3.35
+variable y /home/shruti/oelp-lsp/test/test.sml 3.31 "int"
+	/home/shruti/oelp-lsp/test/test.sml 3.39
+structure Array /usr/lib/mlton/sml/basis/arrays-and-vectors/array-slice.sig 1.11
+	/usr/lib/mlton/sml/basis/arrays-and-vectors/array-slice.sig 19.32
+	/usr/lib/mlton/sml/basis/arrays-and-vectors/array-slice.sig 21.41
+
+\end{verbatim}
+\dots
+
+As seen, the du file has a regular structure, 
+\begin{verbatim}
+[
+kind_of_tag {eg. example, structure, variable, exception, constructor ...} file_path_of_definition
+line-no.character-no type
+occurence1_path  line-no. character-no
+occurence2_path  line-no. character-no
+...
+]
+
+\end{verbatim}
+
+The .du file can be generated using the following command on a shell
+\begin{verbatim}
+[
+mlton -prefer-abs-paths true -show-def-use du-file-name.du project.mlb
+]
+
+\end{verbatim}
+
+
+In the language server implementation described in this report, the useful information from du-file is stored in appropriate data structures to support two requests - code completion and hover.\\
+{\color{blue}\href{http://mlton.org/EmacsDefUseMode}{http://mlton.org/EmacsDefUseMode}}
+
+
+\section{Features}
+\subsection{Code completion}
+This feature is about providing users a list of suggestions to complete a string while working on code based on previously used keywords and identifiers in the program. This works on the principle of a data structure called Trie. Trie is used to store multiple strings efficiently and allows us to extract them in a feasible time complexity. 
+
+Essentially, the Trie data structure looks like a tree, with three types of nodes namely Root (prime element of a Trie), Rest(Internal nodes), and EmptyTrie (the leaves). We assume that all the strings used within the program use ‘a’-’z’, ‘A’-’Z’, ‘\_’ alphabets (which can be easily extended), referred as Alphabet Set . In the very beginning, our Trie would look like a Root node with a list of (EmptyTrie)s called EmptyList, where each EmptyTrie element in the list corresponds to each element in the alphabet set.
+\\
+
+{\centering
+\includegraphics[width=16cm]{images/trie_original.png}}
+
+
+Advantages of using Trie:
+\begin{enumerate}
+\item Can insert and search strings in Trie with a time complexity of O(L * A), where L is the length of a given string, and A is cardinality of Alphabet Set.
+\item Can easily perform prefix search, which won’t be that feasible with a hash map.
+\item Can easily get a sorted result of list of strings in ascending order, for autocomplete feature.
+\end{enumerate}
+
+There are three main utilities provided for the Trie:
+\begin{enumerate}
+    \item \textbf{Insert} - This module enables insertion of all the strings used in the program uptil now(through automated requests from client to server) into the trie. When a new string str (length n) is to be inserted in Trie, the EmptyTrie element of the Root node list corresponding to str[0], will be replaced with Rest(false, str[0], EmptyList); EmptyTrie element corresponding to str[1] will be replaced by Rest(false, str[1], EmptyList), and so on until all characters of the string str are not inserted. For the last character of the string str inserted in Trie, the boolean value of its Rest component is kept ‘true’ representing it as the end point of the string. Before every insertion operation it is ensured that whether the string to be inserted already exists in the Trie or not. \\
+    
+    \\
+    {\centering
+    \includegraphics[width=15cm]{images/trie3.png}}
+    
+    \item \textbf{Search} - It searches for a given string in the Trie through recursive traversal over the trie using pattern matching. \\
+    
+    \\
+    {\centering
+    \includegraphics[width=15cm]{images/trie2.png}}
+    
+    \item \textbf{Delete} - Suppose all the instances of a particular string have been erased from the program, then the delete module is called to remove the same string from the Trie. Now the deletion algorithm are broadly categorised into three different cases:
+    \begin{itemize}
+        \item (CASE 1) - When the given string(key) is a prefix key to another string: We traverse down to the end point of the string and remove it as an end point by changing its boolean value to ‘false’. 
+        \item (CASE 2) - When there is at least one string which is the prefix of this key: This case is dealt with when checked that it is neither the CASE-1 nor CASE-3. Since CASE-1 is not satisfied, it means that there is no other protruding string from the given key. For explanation purposes, let’s assume the string to be deleted from Trie is “abcd” which does not lie in CASE-1, CASE-3. So we just delete the endpoint (Rest(true, ‘d’, EmptyList), make the preceding character in the key (‘c’ here) as a new endpoint by converting it into (Rest(true, ‘c’, [...]), and call for delete again on the left out key i.e. “abc” here.
+        \item (CASE 3) - When the key is independent: We directly replace the element in the Root node list corresponding to key’s 0th index value, to EmptyTrie.
+
+    \end{itemize}\\
+    
+    \\
+    {\centering
+    \includegraphics[width=15cm]{images/trie1.png}}
+    \item 
+\textbf{Autocomplete} - Given a key as a prefix, we search for all possible suffixes present in Trie and return a list of the same. The program pointer reaches the end point of the provided key, and then traverses the sub-Trie to give out all possible suffixes.
+
+\end{enumerate}
+\subsection{Hover}
+The hover request requests hover information at a given location in the text document. A location in a document can be uniquely described by the following three variables: file path, line number and character number.
+\begin{verbatim}
+type Pos =
+  { path : string
+  , lineNo : string
+  , charNo : string
+  }
+\end{verbatim}
+
+
+Hence, the above type ‘Pos’ is constructed to represent locations in documents uniquely.
+
+
+The project’s du-file is parsed to store essential information about symbols namely, a symbol’s name, type, category (structure/signature/exception/functor etc), location of its definition and list of all occurrences.
+
+\begin{verbatim}
+(* 0-based lineNum, charNum numbers as request from client has 0-based line,
+ * character numbers *)
+type SymInfo =
+  { symName : string	
+  , symType : string	(* structure, signature, variable .. etc *)
+  , defLoc : Pos            	(* position of its definition *)
+  , typeInf : string        	(* inferred_type info from .du file *)
+  , occList : Pos list	(* list of all the occurrences of this symbol across files *)
+  }
+    
+\end{verbatim}
+
+A minute implementation detail (taken care of in our implementation) is that the du-file stores line and character number using 1-based indexing whereas the LSP conforms to 0-based indexing in its request and responses.
+
+When a hover request is received, the parameters as input to the language server are the coordinates (file path, line and column number) of the location the user is hovering their cursor at.
+
+It can be noted that the language server needs to efficiently store a symbol’s primary information (symName, symType, defLoc, typeInf) as well as all its occurrences (occList) and retrieve the same efficiently.
+
+To deal with the above scenario efficiently, we define Ordered Maps provided by StandardML as follows,
+\begin{verbatim}
+(* path to file, line num, charnum *)
+type Key = Atom.atom * Atom.atom * Atom.atom
+
+(* Instance of ORD_KEY as INDEX_KEY using ordering of underlying Atoms *)
+structure INDEX_KEY : ORD_KEY = struct
+  type ord_key = Key
+  fun compare ((p1, l1, c1) : Key, (p2, l2, c2) : Key) =
+	List.collate Atom.lexCompare ([p1, l1, c1], [p2, l2, c2])
+end
+
+(* IndexMAP is a ORD_MAP returned by RedBlackMapFn functr *)
+structure IndexMAP = RedBlackMapFn(INDEX_KEY)
+
+(* lookUp is ref to a map, which in turn maps Key to SymInfo ref
+ * Must note that you need to instantiate each entry as well *)
+
+val lookUp : (SymInfo) IndexMAP.map ref = ref IndexMAP.empty
+\end{verbatim}
+
+Ordered Maps are dictionaries in StandardML which allow storage of (key, value) pairs for efficient insertion, search and deletion. The keys in an ordered map must be unique and are used to index into the map for retrieval of values. Since definition positions and occurrences in a codebase are unique, they are the best candidates for the keys of the above maps.
+
+Ordered maps internally use Red-Black trees which support the above mentioned operations in a logarithmic time complexity. The Atom library hashes strings internally. References are used to avoid copying arguments across function calls. Thus, the above implementation is efficient.
+
+
+Note that a user may hover on the occurrence of a symbol and not its definition. At the same time, du-file provides information of only the first line and character number of a symbol.
+The user can hover at the middle of a long variable name and the server must be able to respond with its SymInfo.
+Thus, we introduce another map as follows,
+
+\begin{verbatim}
+(* allSymbols is ref to a map, which in turn maps Key to Pos
+ * Note that now the instantiation is not needed in this as it stores
+ * Pos unlike SymInfo ref which is a reference *)
+
+val allSymbols : Pos IndexMAP.map ref = ref IndexMAP.empty
+
+\end{verbatim}
+
+The map reference `lookUp` maps the definition of each symbol to its symbol information. The map reference `allSymbols` maps the position of each occurrence (even those positions that occur within a symbol’s name) to the symbols’s definition position.
+
+The above design stores a symbol’s information in the SymInfo datatype only once in lookUp map reference for each symbol. The symbols’ occurrences (including the middle positions that the symbols cover) are dealt with in the allSymbols map reference which stores only the definition position of each occurrence of the symbol, which is inexpensive (a record with just three strings).
+
+When a request is received, the input position is converted to a Key, a look-up is performed for the key in allSymbols map reference which yields the symbol definition’s position (if it exists).
+The definition position can be converted to a key and be used to perform a look-up in the lookUp map reference, leading to the symbol’s information wrapped in SML’s OPTION datatype.
+
+A driver function generates and parses the du-file, and computes the above map references.
+
+For the sample code,
+\begin{verbatim}
+fun myfun x y = x + y
+fun another  v = let
+              	fun myfun x y = x * y
+            	in
+              	myfun v 2
+            	end
+val num = List.nth ([1, 2, 3, 4, 5, 6], 5)
+
+\end{verbatim}
+
+Using this sample .du file, (note that the queries use 0-based indexing while the du-file stores 1-based line and column numbers)
+\begin{verbatim}
+variable myfun /home/shruti/oelp-lsp/test/testcase.sml 1.5 "int -> int -> int"
+variable x /home/shruti/oelp-lsp/test/testcase.sml 1.11 "int"
+	/home/shruti/oelp-lsp/test/testcase.sml 1.17
+variable y /home/shruti/oelp-lsp/test/testcase.sml 1.13 "int"
+	/home/shruti/oelp-lsp/test/testcase.sml 1.21
+variable another /home/shruti/oelp-lsp/test/testcase.sml 2.5 "int -> int"
+variable v /home/shruti/oelp-lsp/test/testcase.sml 2.14 "int"
+	/home/shruti/oelp-lsp/test/testcase.sml 5.25
+variable myfun /home/shruti/oelp-lsp/test/testcase.sml 3.23 "int -> int -> int"
+	/home/shruti/oelp-lsp/test/testcase.sml 5.19
+variable x /home/shruti/oelp-lsp/test/testcase.sml 3.29 "int"
+	/home/shruti/oelp-lsp/test/testcase.sml 3.35
+variable y /home/shruti/oelp-lsp/test/testcase.sml 3.31 "int"
+	/home/shruti/oelp-lsp/test/testcase.sml 3.39
+variable num /home/shruti/oelp-lsp/test/testcase.sml 7.5 "int"
+
+...
+variable nth /usr/lib/mlton/sml/basis/list/list.sml 114.10 "'a list * int -> 'a"
+	/home/shruti/oelp-lsp/test/testcase.sml 7.16
+...
+    
+\end{verbatim}
+
+We demonstrate several queries / requests for hover - one for a user-defined function, one for a library function and the last one for a hover attempt where no symbol is located.
+
+Notice how queries work even when the input from hover points to the middle of a symbol. 
+
+\\
+
+\includegraphics[width=16cm]{images/hover1.png} \\
+
+\includegraphics[width=16cm]{images/hover2.png} \\ 
+
+\includegraphics[width=16cm]{images/hover3.png} \\ 
+
+
+
