@@ -1,0 +1,161 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[margin=2cm]{geometry}
+
+%%% Meta data
+
+	\title{Foundations of Data Science \& Machine Learning}
+ 
+	\usepackage{authblk}
+	\author{
+		Summary | Week 02 \\
+		Your~Name\\
+		Roll~Number
+	}
+	\affil{
+			Program (B.Tech. in Computer Sceience \& Engineering etc.)\\
+		Indian Institute of Technology Palakkad
+	}
+
+
+%%% Page formatting
+
+	
+	\usepackage{hyperref}
+	\hypersetup{colorlinks=false,linkcolor=red,citecolor=red,pdfborder={0 0 0}}
+
+	\renewcommand{\arraystretch}{1.5}
+
+%% Algorithms
+	\usepackage{algorithm, algorithmic}
+	\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+	\renewcommand{\algorithmicensure}{\textbf{Output:}}
+% Math 
+	\usepackage{amsmath,amsthm, amssymb}
+
+	% Theorem environments
+	\newtheorem{theorem}{Theorem}
+	\newtheorem{corollary}[theorem]{Corollary}
+	\newtheorem{lemma}[theorem]{Lemma}
+	\newtheorem{proposition}[theorem]{Proposition}
+	\newtheorem{conjecture}[theorem]{Conjecture}
+	\newtheorem{observation}[theorem]{Conjecture}
+
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definition}
+	\newtheorem{question}[theorem]{Question}
+
+	\theoremstyle{remark}
+	\newtheorem*{remark}{Remark}
+	
+	% Shorthands
+	\def\bbN{\mathbb{N}}
+	\def\bbZ{\mathbb{Z}}
+	\def\bbQ{\mathbb{Q}}
+	\def\bbR{\mathbb{R}}
+	\def\bbF{\mathbb{F}}
+
+	\def\tends{\rightarrow}
+	\def\into{\rightarrow}
+	\def\implies{\Rightarrow}
+	\def\half{\frac{1}{2}}
+	\def\quarter{\frac{1}{4}}
+	
+	\newcommand{\set}[1]{\left\{ #1 \right\}}
+	\newcommand{\norm}[1]{\left\Vert #1 \right\Vert}
+	\newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle}
+	\newcommand{\card}[1]{\left\vert #1 \right\vert}
+	\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+	\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+Summarise the summary in three or four sentences. Though it appears at the top
+of the article, it is better to write it after the rest of the article is
+completed.
+
+\end{abstract}
+
+\section{Perceptron learning algorithm}
+
+\begin{algorithm}
+\caption{Perceptron Learning Algorithm}
+\begin{algorithmic} 
+\REQUIRE 
+	Two finite sets $G, B \subset \bbR^n$ which are linearly separable by a
+	hyperplane passing through the origin.
+\ENSURE 
+	$a \in \bbR^n$ such that 
+	for all $x \in G$, $\ip{a}{x} > 0$ and
+	for all $x \in B$, $\ip{a}{x} < 0$.
+
+\medskip
+\STATE $a \leftarrow 0$
+\REPEAT 
+	\FORALL{$x \in G$}
+		\IF{$\ip{a}{x} \leq 0$}
+			\STATE $a \leftarrow a + x$
+		\ENDIF
+	\ENDFOR
+	\FORALL{$x \in B$}
+		\IF{$\ip{a}{x} \geq 0$}
+			\STATE $a \leftarrow a - x$
+		\ENDIF
+	\ENDFOR
+\UNTIL{no updates to $a$}
+\end{algorithmic}
+\end{algorithm}
+
+Give a basic overview of the method in two or three paragraphs. 
+
+\subsection{Running time of the perceptron learning algorithm}
+
+\begin{theorem}
+Given a set $G$ of good points and a set $B$ of bad points in $\bbR^n$ which
+are separable by a hyperplane passing through the origin, the perceptron
+learning algorithm will stop after making at most $4R^2/\delta^2$ updates,
+where $R = \max \{\norm{x} :~ x \in G \cup B\}$ and $\delta$ is the minimum
+distance between the convex hulls of $G$ and $B$.
+\end{theorem}
+
+\begin{proof}
+Write the proof here.
+\end{proof}
+
+\section{Nonlinear separators}
+
+\subsection{Separation in a higher dimensional embedding}
+
+\subsection{Kernel perceptron algorithm}
+
+\begin{algorithm}
+\caption{Kernel Perceptron Learning Algorithm}
+\begin{algorithmic} 
+\REQUIRE 
+	A kernel function $K : (\bbR^n \times \bbR^n) \into \bbR$ and two finite
+	subsets of $\bbR^n$ $G = \{x_1, \ldots, x_k\}$ and $B = \{x_{k+1}, \ldots,
+	x_l\}$  which are  separable by $K$.
+\ENSURE 
+	$\alpha_1, \ldots \alpha_l \in \bbZ$ such that 
+	\begin{align*}
+		\forall x_j \in G,\quad & \sum_{i=1}^{l}\alpha_i K(x_i, x_j) > 0, \\
+		\forall x_j \in B,\quad & \sum_{i=1}^{l}\alpha_i K(x_i, x_j) < 0.
+	\end{align*}
+
+\medskip
+\STATE $\forall i ~ \alpha_i \leftarrow 0$
+\REPEAT 
+	\FORALL{$x \in G$}
+	\STATE{...}
+	\ENDFOR
+	\FORALL{$x \in B$}
+	\STATE{...}
+	\ENDFOR
+\UNTIL{no updates to $\alpha$}
+\end{algorithmic}
+\end{algorithm}
+
+
+\end{document}
