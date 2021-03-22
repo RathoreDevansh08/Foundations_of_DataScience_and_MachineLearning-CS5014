@@ -1,0 +1,289 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{verbatim}
+\usepackage{graphicx}
+
+
+
+%%% Meta data
+
+	\title{Foundations of Data Science \& Machine Learning}
+ 
+	\usepackage{authblk}
+	\author{
+		Summary | Week 04 \\
+		Devansh Singh Rathore\\
+		111701011
+	}
+	\affil{
+			B.Tech. in Computer Science \& Engineering\\
+		Indian Institute of Technology Palakkad
+	}
+
+
+%%% Page formatting
+
+	
+	\usepackage{hyperref}
+	\hypersetup{colorlinks=false,linkcolor=red,citecolor=red,pdfborder={0 0 0}}
+
+	\renewcommand{\arraystretch}{1.5}
+
+%% Algorithms
+	\usepackage{algorithm, algorithmic}
+	\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+	\renewcommand{\algorithmicensure}{\textbf{Output:}}
+% Math 
+	\usepackage{amsmath,amsthm, amssymb}
+
+	% Theorem environments
+	\newtheorem{theorem}{Theorem}
+	\newtheorem{corollary}[theorem]{Corollary}
+	\newtheorem{lemma}[theorem]{Lemma}
+	\newtheorem{proposition}[theorem]{Proposition}
+	\newtheorem{conjecture}[theorem]{Conjecture}
+	\newtheorem{observation}[theorem]{Conjecture}
+
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definition}
+	\newtheorem{question}[theorem]{Question}
+
+	\theoremstyle{remark}
+	\newtheorem*{remark}{Remark}
+	
+	% Shorthands
+	\def\bbN{\mathbb{N}}
+	\def\bbZ{\mathbb{Z}}
+	\def\bbQ{\mathbb{Q}}
+	\def\bbR{\mathbb{R}}
+	\def\bbF{\mathbb{F}}
+
+	\def\tends{\rightarrow}
+	\def\into{\rightarrow}
+	\def\implies{\Rightarrow}
+	\def\half{\frac{1}{2}}
+	\def\quarter{\frac{1}{4}}
+	
+	\newcommand{\set}[1]{\left\{ #1 \right\}}
+	\newcommand{\norm}[1]{\left\Vert #1 \right\Vert}
+	\newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle}
+	\newcommand{\card}[1]{\left\vert #1 \right\vert}
+	\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+	\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+We study about Support Vector Machine (SVM) and Maximum - Margin Separating Hyperplane (MMSHP) mathematically. Later, we look into generalisation of rule 'h' for future unknown points.
+
+\end{abstract}
+
+\section{Generalisation (Cont'd.)}
+
+\begin{figure}[!h]
+\centering
+ \includegraphics[width=0.70\textwidth]{4.0.png}
+ 
+ Fig 1.0 Hope of ML
+ \end{figure}
+ 
+$\rightarrow$ The "In Sample Error" i.e. $E_{in}(g)$ is also known as \textbf{Empirical error}.
+
+$\rightarrow$ The "Out of Sample Error" i.e. $E_{out}(g)$ is also known as \textbf{True error}.
+
+$\rightarrow$ Perceptron, SVM are deterministic algorithms.
+
+$\rightarrow$ Guarantee: If $2(1 - \epsilon)^n < \delta$, then every separating line (through origin) of S has out sample error  at most $\epsilon$ with probability $1 - \delta$.
+
+\[
+P[ \cup_{g \in H, E_{in}(g) = 0} [ E_{out}(g) > \epsilon ] ] < \delta
+\]
+
+i.e. even the 'worst' line that separates S will generalise to X.
+
+$\rightarrow$ The randomness and thus the probability is associated with choosing the S.
+
+$\rightarrow$ Solving 'n' i.e. number of training samples, in terms of $\epsilon$ and $\delta$:
+
+\begin{figure}[!h]
+\centering
+ \includegraphics[width=0.30\textwidth]{4.1.png}
+ 
+ Fig 1.1 $e^x \geq (1 + x)$
+ \end{figure}
+
+\hspace{1cm}
+we want: 
+\[
+2(1 - \epsilon)^n < \delta
+\]
+\[
+2e^{-\epsilon{n}} < \delta
+\]
+\[
+e^{\epsilon{n}} > 2 / \delta
+\]
+\[
+n > (1 / \epsilon) ln(2 / \delta)
+\]
+
+
+\textbf{Theorm 1.0:} let $X \subseteq \bbR^2$ and $f : X \rightarrow \{ +1, -1\}$ be a set of points which are separable by a line through origin. For any $\delta, \epsilon > 0$, if we pick a set S of size $n > (1 / \epsilon) ln(2 / \delta)$ points from X independently and uniformly at random, then, with probability at least $1 - \delta$, every line through origin that separates S also separates at least $1 - \epsilon$ fraction of points in X.
+
+\vspace{0.5cm}
+\textbf{Observation:} 
+\begin{itemize}
+    \item $|X|$ can be < n. (Sampling without replacement)
+    \item $|X|$ can be $\infty$.
+    \item X can be all of $\bbR^2$. But then how do we choose S? because uniform sampling is impossible.
+\end{itemize}
+
+\vspace{0.5cm}
+\section{PAC (Probably Approximately Correct) Model}
+$\rightarrow$ D is the probability distribution on $\bbR^2$. S is n independent D-samples from $\bbR^2$ i.e. $S \, \tilde \, D^n$. And $E_{out}$ is estimated assuming real data also obeys D.
+
+\[
+E_{out}(g) = E_D[g \neq f] = {Pr}_{x \, \tilde \, D}[g(x) \neq f(x)]
+\]
+\[
+= \sum_{x \in X, f(x) \neq g(x)} P_D(x) \; \; \;  \text{(if D is discrete and $P_D$ is its p.m.f.)}
+\]
+\[
+= \int_{x' \in \bbR^2} f_D(x) 1_{f \neq g} (x') dx'
+\]
+
+$\rightarrow$ Hope: if x is sampled from D and $E_{in}(g) = 0$, then:
+\[
+{Pr}_{x \, \tilde \, D}[g(x) \neq f(x)] \text{(w.p. $> 1 - \delta)$}
+\]
+
+$\rightarrow$ $\delta$ is referred to as a \textbf{confidence} parameter, while $\epsilon$ is referred to as a \textbf{accuracy} parameter.
+
+$\rightarrow$ We want guarantee for every correct learning algo. (i.e. every h $\in$ H that has $E_S(h)$ = 0).
+
+$\rightarrow$ Condition for H to be PAC-learnable:
+\[
+P_{S \, \tilde \, D^n}[ \forall h \in H \, \, (E_S(h) = 0) \implies (E_D(h) \leq \epsilon) ] \geq 1 - \delta
+\]
+
+\textbf{Examples for H:}
+\begin{itemize}
+    \item \textbf{Ex1.} H = lines in $\bbR^2$ passing through origin.
+    \item \textbf{Ex2.} Any finite H.
+    \item \textbf{Ex3.} Any finite X.
+    \item \textbf{Ex4.} H = lines in $\bbR^2$.
+    \item \textbf{Ex5.} H = hyperplanes in $\bbR^n$, where n is finite
+\end{itemize}
+
+\vspace{0.5cm}
+$\rightarrow$ \textbf{Ex2. Any finite H.}
+Setup:
+\begin{enumerate}
+    \item X can be any domain.
+    \item D be any probability distribution over X.
+    \item H be any finite class of $\{+1, -1\}$ functions over X.
+    \item Realisability Assumption: $f : X \rightarrow \{+1, -1\}$ be the true labelling and f $\in$ H.
+    \item $\epsilon, \delta \in (0,1), (Accuracy, Confidence)$
+\end{enumerate}
+
+
+\vspace{0.3cm}
+\textbf{Goal:} Prove that $\exists n$ (which may depend in $\epsilon, \delta$ and H) such that,
+\[
+P_{S \, \tilde \, D^n}[ \forall h \in H \, \, (E_S(h) = 0) \implies (E_D(h) \leq \epsilon) ] \geq 1 - \delta
+\]
+\[
+i.e. \, \, P_{S \, \tilde \, D^n}[ \exists h \in H \, \, (E_S(h) = 0) \wedge (E_D(h) > \epsilon) ] < \delta
+\]
+
+\textbf{Proof:} S $\, \tilde \, D^n$ 
+
+Let h be a fixed hypothesis s.t. $E_D(h) > \epsilon$
+\[
+P_{S \, \tilde \, D^n}[(E_S(h) = 0) \wedge (E_D(h) > \epsilon) ] < \delta
+\]
+\[
+\text{Region of Disagreement} = h \triangle f = \{ x \in X: h(x) \neq f(x) = (Good_f \neq Good_h) \}
+\]
+\[
+E_D(h) > \epsilon \text{ is same as } P_D(h \triangle f) > \epsilon
+\]
+If $E_S(h) = 0 \implies$ S contain no point from $h \triangle f$ = ($ S \cap (h \triangle f) = \phi $)
+
+Let $H_{\epsilon} \subseteq H$ be all those hypothesis s.t. $E_D > \epsilon$
+\[
+H_{\epsilon} = \{ h \in H : E_D(h) > \epsilon \}
+\]
+Let $h \in H_{\epsilon}$, 
+\[
+P_{S \, \tilde \, D^n}[(E_S(h) = 0) ] \leq P_{S \, \tilde \, D^n}[S \cap (h \triangle f) = \phi]
+\]
+\[
+\leq (1 - \epsilon)^n
+\]
+\[
+P_{S \, \tilde \, D^n}[\exists h \in H_{\epsilon}: (E_S(h) = 0) ] \leq |H_{\epsilon}| (1 - \epsilon)^n
+\]
+\[
+\leq |H| (1 - \epsilon)^n
+\]
+\[
+\leq |H| e^{-\epsilon n}
+\]
+
+Now we want:
+\[
+|H| e^{-\epsilon n} < \delta
+\]
+
+which simplifies to:
+\[
+n > (1 / \epsilon)(ln|H| + ln(1 / \delta))
+\]
+
+\vspace{0.5cm}
+$\rightarrow$ \textbf{Ex3. Any finite X.}
+
+\textbf{Obs.:} No. of "distinct" hypothesis possible is $\leq 2^{|X|}$
+
+if $|X| = n$, then $2^N$ boolean functions
+
+If X is finite, then H is finite. Which implies that we can use the proof from Ex2. But you consider two separation to be same if the executing good set is the same.
+
+$h1 = h2$ if $h1^{-1} = h2^(-1)$
+
+But, this is almost useless: 
+\[ 
+n > (1 / \epsilon)(ln(2^{|X|}) + ln(1 / \delta)) = (1 / \epsilon)(|X| + ln(1 / \delta))
+\]
+
+Better estimation method:
+
+H = set of lines in $\bbR^2$
+
+$X \subseteq \bbR^2, |X| = N$
+
+To find: \# distinct hypothesis in H?
+
+\# distinct good sets among N points in $\bbR^2$ that can be carved out by straight lines
+
+\begin{figure}[!h]
+\centering
+ \includegraphics[width=0.50\textwidth]{4.2.png}
+ 
+ Fig 2.0 Proof by Combinatorics
+ \end{figure}
+
+\textbf{(Exercise:)} Ans: $(^{n+1}_2) + 1$, using induction on n. 
+\[
+(^{n+1}_2) + 1     \leq n^2
+\]
+
+So now, 
+\[
+n > (1 / \epsilon)(2ln(N) + ln(1 / \delta))
+\]
+
+\end{document}
