@@ -1,0 +1,339 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{verbatim}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{color,soul}
+\usepackage{xcolor}
+\newcommand{\mathcolorbox}[2]{\colorbox{#1}{$\displaystyle #2$}}
+
+
+
+%%% Meta data
+
+	\title{Foundations of Data Science \& Machine Learning}
+ 
+	\usepackage{authblk}
+	\author{
+		Summary | Week 06\\
+		Devansh Singh Rathore\\
+		111701011
+	}
+	\affil{
+			B.Tech. in Computer Science \& Engineering\\
+		Indian Institute of Technology Palakkad
+	}
+
+
+%%% Page formatting
+
+	
+	\usepackage{hyperref}
+	\hypersetup{colorlinks=false,linkcolor=red,citecolor=red,pdfborder={0 0 0}}
+
+	\renewcommand{\arraystretch}{1.5}
+
+%% Algorithms
+	\usepackage{algorithm, algorithmic}
+	\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+	\renewcommand{\algorithmicensure}{\textbf{Output:}}
+% Math 
+	\usepackage{amsmath,amsthm, amssymb}
+
+	% Theorem environments
+	\newtheorem{theorem}{Theorem}
+	\newtheorem{corollary}[theorem]{Corollary}
+	\newtheorem{lemma}[theorem]{Lemma}
+	\newtheorem{proposition}[theorem]{Proposition}
+	\newtheorem{conjecture}[theorem]{Conjecture}
+	\newtheorem{observation}[theorem]{Conjecture}
+
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definition}
+	\newtheorem{question}[theorem]{Question}
+
+	\theoremstyle{remark}
+	\newtheorem*{remark}{Remark}
+	
+	% Shorthands
+	\def\bbN{\mathbb{N}}
+	\def\bbZ{\mathbb{Z}}
+	\def\bbQ{\mathbb{Q}}
+	\def\bbR{\mathbb{R}}
+	\def\bbF{\mathbb{F}}
+
+	\def\tends{\rightarrow}
+	\def\into{\rightarrow}
+	\def\implies{\Rightarrow}
+	\def\half{\frac{1}{2}}
+	\def\quarter{\frac{1}{4}}
+	
+	\newcommand{\set}[1]{\left\{ #1 \right\}}
+	\newcommand{\norm}[1]{\left\Vert #1 \right\Vert}
+	\newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle}
+	\newcommand{\card}[1]{\left\vert #1 \right\vert}
+	\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+	\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+We discuss Sauer's Lemma and then use its results for our on going calculation. Then we discuss the case PAC learnability when VC dimension of hypothesis class is $\infty$. Finally, we try to reduce the sample complexity for finite VC dimension cases.
+
+\end{abstract}
+
+\section{Sauer's Lemma}
+
+\textbf{Lemma: }If a hypothesis class H has a finite VC Dimension d, then
+\[
+\mathcolorbox{yellow}{g_H(n) \leq \sum^{d}_{i=0} (^n_i) = (^n_{\leq d})}
+\]
+\textbf{Proof: } (Induction on n)
+
+Let g(d, n) = max { $g_H(n)$ : H has VC dimension d }
+
+We will show g(d, n) $\leq (^n_{\leq d})$
+
+\textbf{NOTE:} When trying to prove for some n, we assume the claim for all d and n-1.
+
+\textbf{Base case:} (n = 0)
+
+if there are no points, the only possible hypothesis class is $\phi$ and hence 
+\[
+\forall d, g(d, 0) = 1 = (^0_{\leq d})
+\]
+
+(\textbf{Exercise:} prove for n=1 case: g(0,1) = 1, g(d,1) = 2 $\forall d>0$)
+
+\textbf{Induction Hypothesis}:
+\[
+\forall d, g(d,n-1) \leq (^{n-1}_{\leq d})
+\]
+
+\textbf{Induction Step(n):}
+
+H : any hypothesis class with VC dim. d
+
+$X_n$ : any set of n points from X, $X_n \in (^X_n)$
+
+$H_n = H|_{X_n} = \{ h|_{X_n} : h \in X_n \}$
+
+\textbf{Claim: } $|H_n| \leq (^n_{\leq d})$
+
+Let $X_n = \{ x_1, x_2, ..., x_n \}$ and $X_{n-1} = \{ x_1, x_2, ..., x_{n-1} \} = X_n \backslash \{ x_n \}$
+
+Two functions f, g $\in H_n$ are said to be equivalent if $f|_{X_{n-1}} = g|_{X_{n-1}}$ i.e. $f \approx g$ iff $f(x_i) = g(x_i) \forall i \in [n-1]$.
+
+This is an equivalence relation and $\forall f \in H_n, |[f]| = 1 or 2$
+
+Let $\alpha =$ \# 2-sized eq. classes and
+
+$\beta =$ \# 1-sized eq. classes
+
+So, $|H_n| = 2 \alpha + \beta$, whereas $|H_{n-1}| = \alpha + \beta$
+
+Since $H_{n-1} = H_n|_{X_{n-1}} = H|_{X_{n-1}}$,
+\[
+|H_{n-1}| \leq g(d, n-1) \leq (^{n-1}_{\leq d})
+\]
+\[
+i.e. \, \, \alpha + \beta \leq (^{n-1}_{\leq d})
+\]
+
+Consider $H'_{n-1} \subseteq H_{n-1}$ obtained by restricting 2-sized eq. classes of $H_n$, hence $|H'_{n-1}| = \alpha$.
+
+$H'_{n-1}$ cannot shatter a subset $T \subseteq X_{n-1}$ of size larger than d-1, because then $T \cup \{ x_n \}$ is shattered by $H_n$.
+
+Hence VC dim.($H'_{n-1}$) $\leq d-1$
+\[
+|H'_{n-1}| \leq g(d-1, n-1) \leq (^{n-1}_{\leq d-1})
+\]
+\[
+i.e. \, \, \alpha \leq (^{n-1}_{\leq d-1})
+\]
+
+\[
+|H_n| = 2 \alpha + \beta
+\]
+\[
+= (\alpha + \beta) + \alpha
+\]
+\[
+\leq (^{n-1}_{\leq d}) + (^{n-1}_{\leq d-1})
+\]
+\[
+\leq (^{n}_{\leq d})
+\]
+Hence Proved.
+
+\subsection{Converse of Sauer's Lemma}
+
+VC Dim(H) = $\infty \implies g_H(n) = ?$ 
+
+VC Dim(H) = $\infty \implies \exists$ an infinite set $T \subseteq X$ shattered by H.
+
+Let $T_n \in (^T_n)$, then $T_n$ is also shattered by H.
+
+Hence $|H|_{T_n}| = 2^n$
+
+So $g_H(n) \geq 2^n$
+
+But \# of binary functions on any n-set $\leq 2^n$
+
+So $g_H(n) = 2^n$
+\[
+\mathcolorbox{yellow}{Hence, \, \, VC Dim(H) = \infty \implies g_H(n) = 2^n}
+\]
+
+\textbf{Obs.: } $g_H()$ is either polynomially bounded or otherwise exponential, nothing in b/w.
+
+\section{Finishing the Calculation}
+
+\[
+g_H(n) 2^{- \epsilon n / 2} \leq \delta / 2
+\]
+\[
+(^{2n}_{d}) 2^{- \epsilon n / 2} \leq \delta / 2
+\]
+\[
+Upon \, solving \, gives, \,\, n \geq 4 / \epsilon ( 2d \, log(1 / \epsilon) + log(2 / \delta) )
+\]
+
+\textbf{Theorm: } Let H be the hypothesis class over a domain X with a finite VC dimencion d. For every $\epsilon, \delta \in (0,1)$, for any sampling distribution D and any time labelling f : X $\rightarrow \{+1, -1\}$,
+\[
+P_{S \sim D^n} [ \exists h \in H : E_S(h, f) = 0 \, \wedge \, E_D(h,f) > \epsilon ] \leq \delta
+\]
+whenever
+\[
+\mathcolorbox{yellow}{n \geq 4 / \epsilon ( 2d \, log(1 / \epsilon) + log(2 / \delta) )}
+\]
+
+\textbf{Theorm (Equivalently): } A hypothesis class H with a finite VC-dimension d is PAC learnable with sample complexity 
+\[
+S_H(\epsilon, \delta) \leq 4 / \epsilon ( 2d \, log(1 / \epsilon) + log(2 / \delta) )
+\]
+\[
+\in O(1 / \epsilon ( d \, log(1 / \epsilon) + log(1 / \delta) ))
+\]
+
+\section{Sample Complexity Lower Bounds}
+
+\hspace{0.5cm}
+$\rightarrow$ \textbf{CONVERSE: VC-dimension(H) = $\infty \implies$ Not PAC learnable?} 
+
+\mathcolorbox{yellow}{$(Answer \; is \; YES)$}
+
+Given H, $\forall D, \forall f, \forall \epsilon, \forall \delta$
+
+\textbf{Claim: } $S_H(1/2, 1/2) \geq 1/2 \, VC-Dim(H)$
+
+given H : any hypothesis class of VC dimension d.
+
+given X : Domain of H
+
+f(x) = +1 $\forall x \in X$
+
+$T = \{ x_1, ..., x_d \} \subseteq X$ : A set shattered by H.
+
+Clever Choice:
+
+D : P(x) = \{1/d $\forall x \in T$, and 0 $\forall x \in X \ T$ \}
+
+$\epsilon, \delta = 1/2$
+
+Let n $< d/2$ and $S \sim D^n$
+
+$=>$ then, at least half the points in T are not in S.
+
+$=> \exists h : E_S(h, f) = 0 \wedge E_D(h, f) > 1/2 $
+
+$=> P_{S \sim D^n} [\exists h : E_S(h,f) = 0 \wedge E_D(h,f)> \epsilon] = 1 > \delta (i.e. \, 1/2)$
+
+Hence $S_H(1/2, 1/2) \geq d/2$. (Note: $S_H$ is decreasing in $\delta$ and $\epsilon$ so it is no better for smaller $\delta$ and $\epsilon$)
+
+\vspace{0.3cm}
+$\rightarrow$ \textbf{Can we have a smarter algorithm?}
+
+Let 'A' be the smart algo.
+
+$h^{*} = A(S)$ = Best choice among $\{ h \in H : E_S(h,f) = 0 \}$
+
+We will beat it with same D but different f's.
+
+Let f(x) = $\{$+1 if $x \in X / T$, $\{$+1 w.p. 1/2, -1 w.p. 1/2$\}$ if $x \in T \}$ ("Probabilistic Method") ($f \sim F$)
+
+$n < d/2$
+
+For any set S of at most n elements from T (At least 1/2 of T is outside S)
+\[
+Expectation(E)_{f \sim F} [ E_D(A(S), f) ] = (1/2)|T / S| > 1/4
+\]
+
+Hence $\exists f$ s.t. $\forall S, \, E_D(A(S),f) > 1/4 = \epsilon$
+
+$=> P_{S \sim D^n} [ E_D(A(S),f)> 1/4 ] = 1$
+
+(Can a randomized algo. work? NO)
+
+\vspace{0.3cm}
+$\rightarrow$ \textbf{TIGHTNESS: For finite VC-dimension, can we reduce the sample complexity?}
+
+Final result - 
+\[
+S_H(h,f) = \Omega((d / \epsilon) log(1/ \epsilon) + (1 / \epsilon) log(1 / \delta))
+\]
+
+so tight upto the constraints
+
+($log(1 / \epsilon)$ term can be removed if we make 'smart algorithms')
+
+\textbf{Idea: } $\delta_H(\epsilon, \delta) \geq \Omega(d / \epsilon)$
+
+T = $\{ x_1, ..., x_d \}$ shattered by H
+
+$x_o \in X / T$
+
+$D : P(x) = \{ 0 \; if \; x \in X \backslash (T \cup \{ x_0 \}), \; 1 - 2 \epsilon \; if \; x = x_0, \; 2 \epsilon / d \; if \; x \in T \}$
+
+Let $n <  d / (8 \epsilon)$
+\[
+E_{S \sim D^n} [|S \cap T|] = n P_{x \sim D} [x \in T]
+\]
+\[
+= n.2 \epsilon < (d / (8 \epsilon)) 2 \epsilon = d/4
+\]
+\[
+P_{S \sim D^n}[|S \cap T| \geq d/2] \leq 1/2 \;\; (Markov \; Inequality)
+\]
+\[
+P_{S \sim D^n}[|S \cap T| < d/2] > 1/2
+\]
+
+\[
+|S \cap T| < d/2 \implies \exists h : E_S(h,f) = 0 \wedge E_D(h,f) > \epsilon
+\]
+\[
+Hence \; P_{S \sim D^n} [\exists h : E_S(h,f) = 0 \wedge E_D(h,f) > \epsilon] > 1/2
+\]
+\[
+i.e. \; S_H(\epsilon, 1/2) \geq d/(8 \epsilon) = \Omega (d/ \epsilon)
+\]
+\[
+\mathcolorbox{yellow}{d/(8 \epsilon) \leq S_H(\epsilon, 1/2) \leq (8d/ \epsilon)log(1/ \epsilon) + (4/\epsilon)log(2/(1/2)) = (8d/ \epsilon)log(1/ \epsilon) + 8/\epsilon}
+\]
+
+Rule of thumb : $d/\epsilon$
+
+
+\begin{comment}
+\begin{figure}[!h]
+\centering
+ \includegraphics[width=0.70\textwidth]{figure.png}
+ 
+ Fig a.b figure
+ \end{figure}
+\end{comment}
+
+\end{document}
