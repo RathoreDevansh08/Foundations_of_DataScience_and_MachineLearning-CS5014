@@ -1,0 +1,260 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{verbatim}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{color,soul}
+\usepackage{xcolor}
+\newcommand{\mathcolorbox}[2]{\colorbox{#1}{$\displaystyle #2$}}
+
+%%% Meta data
+
+	\title{Foundations of Data Science \& Machine Learning}
+ 
+	\usepackage{authblk}
+	\author{
+		Summary | Week 05 \\
+		Devansh Singh Rathore\\
+		111701011
+	}
+	\affil{
+			B.Tech. in Computer Science \& Engineering\\
+		Indian Institute of Technology Palakkad
+	}
+
+
+%%% Page formatting
+
+	
+	\usepackage{hyperref}
+	\hypersetup{colorlinks=false,linkcolor=red,citecolor=red,pdfborder={0 0 0}}
+
+	\renewcommand{\arraystretch}{1.5}
+
+%% Algorithms
+	\usepackage{algorithm, algorithmic}
+	\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+	\renewcommand{\algorithmicensure}{\textbf{Output:}}
+% Math 
+	\usepackage{amsmath,amsthm, amssymb}
+
+	% Theorem environments
+	\newtheorem{theorem}{Theorem}
+	\newtheorem{corollary}[theorem]{Corollary}
+	\newtheorem{lemma}[theorem]{Lemma}
+	\newtheorem{proposition}[theorem]{Proposition}
+	\newtheorem{conjecture}[theorem]{Conjecture}
+	\newtheorem{observation}[theorem]{Conjecture}
+
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definition}
+	\newtheorem{question}[theorem]{Question}
+
+	\theoremstyle{remark}
+	\newtheorem*{remark}{Remark}
+	
+	% Shorthands
+	\def\bbN{\mathbb{N}}
+	\def\bbZ{\mathbb{Z}}
+	\def\bbQ{\mathbb{Q}}
+	\def\bbR{\mathbb{R}}
+	\def\bbF{\mathbb{F}}
+
+	\def\tends{\rightarrow}
+	\def\into{\rightarrow}
+	\def\implies{\Rightarrow}
+	\def\half{\frac{1}{2}}
+	\def\quarter{\frac{1}{4}}
+	
+	\newcommand{\set}[1]{\left\{ #1 \right\}}
+	\newcommand{\norm}[1]{\left\Vert #1 \right\Vert}
+	\newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle}
+	\newcommand{\card}[1]{\left\vert #1 \right\vert}
+	\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+	\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+In this week's lectures, we continue discussing PAC. Further, we define growth function and VC dimension of Hypothesis classes.
+
+\end{abstract}
+
+\section{PAC (Cont'd.)}
+
+$\rightarrow$ \textbf{Examples for H:}
+\begin{itemize}
+    \item \textbf{Ex1.} H = lines in $\bbR^2$ passing through origin.
+    \item \textbf{Ex2.} Any finite H.
+    \item \textbf{Ex3.} Any finite X.
+    \item \textbf{Ex4.} H = lines in $\bbR^2$.
+    \item \textbf{Ex5.} H = hyperplanes in $\bbR^n$, where n is finite
+\end{itemize}
+
+\vspace{0.3cm}
+$\rightarrow$ \textbf{Ex3. Special Case:} The Hypothesis class of lines in $\bbR^2$ separating a finite input space X is PAC-learnable with $\mathcolorbox{yellow}{n \geq (1 / \epsilon)(2ln|x| + ln(1 / \delta))}$ training examples. This is called \textbf{"Smart Move"}.
+
+\vspace{0.3cm}
+$\rightarrow$ \textbf{Ex3. - Smartest Move:} 
+\begin{itemize}
+    \item If $E_out(h)$ is bad ($> \epsilon$), then it's very likely (with prob. $>$ 1/2), that for another $S' \sim D^n$, $E_{S'}(h)$ is also bad ($> \epsilon / 2$).
+    \item Hence instead of worrying about all X, we need to worry only about $S \cup S'$.
+\end{itemize}
+
+\vspace{0.3cm}
+
+Let $S \sim D^n$
+
+Take $h \in H$ : $E_S(h) = 0 \, \wedge \, E_D(h) > \epsilon$
+
+Then for some $S' \sim D^n$, $E_{S'}(h) > \epsilon / 2$ (with high prob. $\approx \geq 1/2$)
+
+\vspace{0.2cm}
+
+\textbf{Proof:}
+\[
+E_D(h) > \epsilon \implies P_D(h \triangle f) = p > \epsilon
+\]
+\[
+\implies P_{x \sim D}(h(x) \neq f(x)) = p
+\]
+\[
+\implies P_{S' \sim D^n}(|S' \cap (h \triangle f)| = k) \sim Binom_p(n,k)
+\]
+\[
+\implies E_{S' \sim D^n}|S' \cap (h \triangle f)| = pn
+\]
+\[
+\implies P_{S' \sim D^n}(|S' \cap (h \triangle f)| = pn/2) < 1/2 \, \, \, \text{(Using Chernoff bound, though very loose bound)}
+\]
+\[
+\implies P_{S' \sim D^n}[E_{S'}(h) < p/2] < 1/2
+\]
+\[
+\implies P_{S' \sim D^n}[E_{S'}(h) \geq p/2] \geq 1/2
+\]
+\[
+\mathcolorbox{yellow}{\implies P_{S' \sim D^n}[E_{S'}(h) \geq \epsilon / 2] \geq 1/2}
+\]
+
+$\rightarrow$ Since in the last random experiment: $S \sim D^n$, $S' \sim D^n$
+
+Event A:: $\exists h \in H : E_S(h) = 0 \wedge E_D(h) > \epsilon$ 
+
+Event B:: $\exists h \in H : E_S(h) = 0 \wedge E_{S'}(h) > \epsilon / 2$
+
+We proved: P(B/A) $\geq 1/2$
+\[
+1/2 \leq P(B/A) = P(B \cap A)/P(A) \leq P(B)/P(A)
+\]
+\[
+P(A) \leq 2P(B)
+\]
+
+$\rightarrow$ \textbf{Now we can forget X and just worry about $S \cup S'$}
+
+\textbf{Model:} $T = S \cup S' \sim D^{2n}$
+
+S and S' are obtained by uniform random equipartition.
+
+\textbf{Lemma:} Let $A \subseteq S \cup S'$, then what is $P(A \subseteq S)$ in a random equipartition.
+\[
+P(A \subseteq S) = (^{2n-k}_{n-k}) / (^{2n}_{n}) \; \; \; \; \text{($n = |S| = |S'|$, $k = |A|$)}
+\]
+\[
+= ((n)(n-1)...(n-k+1)) / ((2n)(2n-1)...(2n-k+1))
+\]
+\[
+< (1/2).(1/2)...(1/2) = (1/2)^k = (1/2)^{|A|}
+\]
+
+So, for any $h \in H$,
+
+\[
+\mathcolorbox{yellow}{P_{S,S' \sim D^n}[(E_S(h,f) = 0) \wedge (E_{S'}(h,f) > \epsilon / 2)] \leq (1/2)^{|A|} \leq (1/2)^{\epsilon n / 2}}
+\]
+\[
+\text{(Proof: $A = \{x \in S \cup S' : h(x) \neq f(x) \}$, $|A| > \epsilon n / 2 = k $)}
+\]
+
+$\rightarrow$ Now considering $B_h := [(E_S(h,f) = 0) \wedge (E_{S'}(h,f) > \epsilon / 2)]$, so
+\[
+P_{S,S' \sim D^n}[\exists h \in H : B_h] \leq ("\#distinct \, h")(1/2)^{\epsilon n / 2}
+\]
+\[
+\text{(considering $h_1 = h_2$ (i.e. $h_1 \approx h_2 \sim f $) if $h_1|_{S \cup S'} = h_2|_{S \cup S'}$)}
+\]
+\[
+\leq |\{ [h]: h \in H \}| (1/2)^{\epsilon n / 2}
+\]
+\[
+\leq (2n)^2(1/2)^{\epsilon n / 2} \leq \delta / 2 \; (required)
+\]
+
+\vspace{0.5cm}
+\section{Growth function \& VC Dimension of Hypothesis Classes}
+
+$\rightarrow$ Extending idea from \textbf{Ex4.} case to \textbf{Ex5.} case.
+
+\textbf{Definition:} The \textbf{Growth Function} of a hypothesis class H on a domain X is defined as: 
+
+\hspace{0.5cm} $g_H(n) =$ Maximum no. of distinct function that can be obtained by restricting the 
+
+\hspace{2.15cm} function in H to a set of n points in X.
+
+For $T \subseteq X$ let $H|_T = \{ h|_T : h \in H \}$, where $h : X \rightarrow \{+1,-1\}$ and $h|_T : T \rightarrow \{+1,-1\}$,then:
+\[
+g_H(T) = |H|_T| << |H|
+\]
+\[
+g_N(n) = max \{ g_H(T) : T \in (^X_n) \}
+\]
+
+$\rightarrow$ If H = linear separators in $\bbR^2$, then $g_N(n) = (^{n+1}_{2}) + 1$
+
+$\rightarrow$ Let H be the hypothesis class with growth function $g_H()$. For any $\epsilon, \delta \in (0,1)$, any distribution D on $\bbR^2$ and any true labelling $f : \bbR^2 \rightarrow \{+1,-1\}$, $P_{S \sim D^n}[ \exists h \in H : (E_S(h,f) = 0) \wedge (E_D(h,f) > \epsilon) ] \leq \delta$ whenever n is large enough so that $g_H(2n)(1/2)^{\epsilon n / 2} \leq \delta / 2$ (will work if $g_H$ is polynomial).
+
+\vspace{0.2cm}
+$\rightarrow$ When is $g_H() \in O(n^d)$ i.e polynomial bounded?
+
+ANS. When the VC dimension of N is finite. ($g_H() \in O(n^d) <=> H$ has finite VC dimension)
+
+\vspace{0.2cm}
+\textbf{Definition:} A hypothesis class H over a domain X is said to \textbf{shatter} a set $T \subseteq X$ if every binary function on T can be obtained as the restriction $h|_T$ of some $h \in H$. The \textbf{VC Dimension} of H is the size of a largest set that is shattered by H.
+
+$\rightarrow$ Examples:
+
+\begin{center}
+\begin{tabular}{ | c | c | }
+ \hline
+ \textbf{H} & \textbf{VC-d(H)} \\ 
+ \hline
+ Intervals in $\bbR$ & 2 \\  
+ \hline
+ Lines in $\bbR^2$ & 3 \\
+ \hline
+ Axis aligned rectangles in $\bbR^2$ & 4 \\
+ \hline
+ Polygons in $\bbR^2$ & $\infty$ \\
+ \hline
+ Circles in $\bbR^2$ & 3 \\
+ \hline
+ Half spaces in $\bbR^d$ & d+1 \\
+ \hline
+ Spheres in $\bbR^d$ & d+1 \\
+ \hline
+\end{tabular}
+\end{center}
+
+\begin{comment}
+\begin{figure}[!h]
+\centering
+ \includegraphics[width=0.70\textwidth]{figure.png}
+ 
+ Fig a.b figure
+ \end{figure}
+\end{comment}
+
+\end{document}
