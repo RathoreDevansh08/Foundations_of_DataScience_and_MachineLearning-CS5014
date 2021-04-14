@@ -1,7 +1,11 @@
 \documentclass[a4paper, 12pt]{article}
 \usepackage[margin=2cm]{geometry}
 \usepackage{verbatim}
+\usepackage{textcomp}
 \usepackage{graphicx}
+\usepackage{color,soul}
+\usepackage{xcolor}
+\newcommand{\mathcolorbox}[2]{\colorbox{#1}{$\displaystyle #2$}}
 
 
 
@@ -86,6 +90,10 @@ x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x 
 
 
 \begin{comment}
+%% Highlighter
+\mathcolorbox{yellow}{}
+
+%% Figure
 \begin{figure}[!h]
 \centering
  \includegraphics[width=0.70\textwidth]{figure.png}
