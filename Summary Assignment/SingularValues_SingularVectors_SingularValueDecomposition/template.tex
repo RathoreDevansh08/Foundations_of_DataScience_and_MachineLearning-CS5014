@@ -1,0 +1,200 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{verbatim}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{color,soul}
+\usepackage{xcolor}
+\newcommand{\mathcolorbox}[2]{\colorbox{#1}{$\displaystyle #2$}}
+
+
+
+%%% Meta data
+
+	\title{Foundations of Data Science \& Machine Learning}
+ 
+	\usepackage{authblk}
+	\author{
+		Summary | Week 11 \\
+		Devansh Singh Rathore\\
+		111701011
+	}
+	\affil{
+			B.Tech. in Computer Science \& Engineering\\
+		Indian Institute of Technology Palakkad
+	}
+
+
+%%% Page formatting
+
+	
+	\usepackage{hyperref}
+	\hypersetup{colorlinks=false,linkcolor=red,citecolor=red,pdfborder={0 0 0}}
+
+	\renewcommand{\arraystretch}{1.5}
+
+%% Algorithms
+	\usepackage{algorithm, algorithmic}
+	\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+	\renewcommand{\algorithmicensure}{\textbf{Output:}}
+% Math 
+	\usepackage{amsmath,amsthm, amssymb}
+
+	% Theorem environments
+	\newtheorem{theorem}{Theorem}
+	\newtheorem{corollary}[theorem]{Corollary}
+	\newtheorem{lemma}[theorem]{Lemma}
+	\newtheorem{proposition}[theorem]{Proposition}
+	\newtheorem{conjecture}[theorem]{Conjecture}
+	\newtheorem{observation}[theorem]{Conjecture}
+
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definition}
+	\newtheorem{question}[theorem]{Question}
+
+	\theoremstyle{remark}
+	\newtheorem*{remark}{Remark}
+	
+	% Shorthands
+	\def\bbN{\mathbb{N}}
+	\def\bbZ{\mathbb{Z}}
+	\def\bbQ{\mathbb{Q}}
+	\def\bbR{\mathbb{R}}
+	\def\bbF{\mathbb{F}}
+
+	\def\tends{\rightarrow}
+	\def\into{\rightarrow}
+	\def\implies{\Rightarrow}
+	\def\half{\frac{1}{2}}
+	\def\quarter{\frac{1}{4}}
+	
+	\newcommand{\set}[1]{\left\{ #1 \right\}}
+	\newcommand{\norm}[1]{\left\Vert #1 \right\Vert}
+	\newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle}
+	\newcommand{\card}[1]{\left\vert #1 \right\vert}
+	\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+	\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+In this lecture series we will discuss about Singular Values, Singular Vectors and Singular Value Decomposition.
+
+\end{abstract}
+
+\section{Singular Values and Singular Vectors}
+
+\hspace{0.45cm}
+\textbf{Definition:} Consider n points $x_1, x_2, ..., x_n$ in $\bbR^d$ ($d >> 1$). Can we find a lower dimensional (k) subspace $S_k$ of $\bbR^d$ s.t. $x_1, x_2, ..., x_n$ can be "approximated well" by points $y_1, y_2, ..., y_n$ in $S_k$? This is called \textbf{Dimensionality Reduction}.
+
+$\rightarrow$ "Approximated well" can have various interpretations:
+
+\textbf{SVD - interpretation:} Choose the k-dimensional subspace which minimises the sum of squared Euclidean distances.
+
+\begin{figure}[!h]
+\centering
+ \includegraphics[width=0.30\textwidth]{10a.png}
+ 
+ Fig 1.0 $S_1$ of $\bbR^2$
+ \end{figure}
+
+That is, 
+\[
+S_k = argmin_{S \in s} \sum_{i=1}^{n} dist^2(x_i, S)
+\]
+
+where the minimisation is over all k-dimensional subspaces of $\bbR^d$
+
+\vspace{0.2cm}
+\textbf{Notes:}
+
+1. It is different from the least square regression line.
+
+\hspace{0.5cm}
+* vertical distance
+
+\hspace{0.5cm}
+* not necessarily through origin.
+
+\begin{figure}[!h]
+\centering
+ \includegraphics[width=0.30\textwidth]{10b.png}
+ 
+ Fig 1.1 Regression line
+ \end{figure}
+
+2. Once you find $S_k, \; \forall i \in [n]$ let $y_i = Proj_{S_k} (x_i)$ be orthognal projection of $x_i$ on $S_k$.
+
+Then the matrix 
+\[
+B_k =
+\begin{bmatrix}
+y_1\\
+y_2\\
+:\\
+y_n
+\end{bmatrix}_{n \times d}
+\]
+
+is the best k-rank approximation for the data matrix
+\[
+A_k =
+\begin{bmatrix}
+x_1\\
+x_2\\
+:\\
+x_n
+\end{bmatrix}_{n \times d}
+\]
+
+Note: rank($B_k$) $\leq k$
+
+That is
+\[
+B_k = argmin_{B \in b} ||A - B||_F
+\]
+
+where the minimisation is over all $n \times d$ real matrices with rank $\leq k$.
+
+($||A||_F^2 = \sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}^2$)
+
+\textbf{Proof Idea:}
+
+$||A - B_k||_F^2 = \sum_{i=1}^n \sum_{j=1}^d (x_{ij} - y_{ij})^2$
+
+$ = \sum_{i=1}^n ||x_i - y_i||^2$
+
+$ = \sum_{i=1}^n dist^2 (x, S_k)$
+
+\begin{figure}[!h]
+\centering
+ \includegraphics[width=0.25\textwidth]{10c.png}
+ 
+ Fig 1.2 proof idea
+ \end{figure}
+
+\vspace{0.2cm}
+\textbf{But how do we find S?}
+
+\hspace{0.5cm}
+- Equivalently we find an orthogonal basis $\{ v_1, v_2, ..., v_k \}$ for $S_k$.
+
+\hspace{0.5cm}
+- In fact we do more. We find an orthogonal basis $\{ v_1, v_2, ..., v_k \}$ of $\bbR^d$
+
+\begin{comment}
+%% Highlighter
+\mathcolorbox{yellow}{}
+
+%% Figure
+\begin{figure}[!h]
+\centering
+ \includegraphics[width=0.70\textwidth]{figure.png}
+ 
+ Fig a.b figure
+ \end{figure}
+\end{comment}
+
+\end{document}
