@@ -1,0 +1,239 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{verbatim}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{color,soul}
+\usepackage{xcolor}
+\newcommand{\mathcolorbox}[2]{\colorbox{#1}{$\displaystyle #2$}}
+
+
+
+%%% Meta data
+
+	\title{Foundations of Data Science \& Machine Learning}
+ 
+	\usepackage{authblk}
+	\author{
+		Summary | Week 07 \\
+		Devansh Singh Rathore\\
+		111701011
+	}
+	\affil{
+			B.Tech. in Computer Science \& Engineering\\
+		Indian Institute of Technology Palakkad
+	}
+
+
+%%% Page formatting
+
+	
+	\usepackage{hyperref}
+	\hypersetup{colorlinks=false,linkcolor=red,citecolor=red,pdfborder={0 0 0}}
+
+	\renewcommand{\arraystretch}{1.5}
+
+%% Algorithms
+	\usepackage{algorithm, algorithmic}
+	\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+	\renewcommand{\algorithmicensure}{\textbf{Output:}}
+% Math 
+	\usepackage{amsmath,amsthm, amssymb}
+
+	% Theorem environments
+	\newtheorem{theorem}{Theorem}
+	\newtheorem{corollary}[theorem]{Corollary}
+	\newtheorem{lemma}[theorem]{Lemma}
+	\newtheorem{proposition}[theorem]{Proposition}
+	\newtheorem{conjecture}[theorem]{Conjecture}
+	\newtheorem{observation}[theorem]{Conjecture}
+
+	\theoremstyle{definition}
+	\newtheorem{definition}[theorem]{Definition}
+	\newtheorem{question}[theorem]{Question}
+
+	\theoremstyle{remark}
+	\newtheorem*{remark}{Remark}
+	
+	% Shorthands
+	\def\bbN{\mathbb{N}}
+	\def\bbZ{\mathbb{Z}}
+	\def\bbQ{\mathbb{Q}}
+	\def\bbR{\mathbb{R}}
+	\def\bbF{\mathbb{F}}
+
+	\def\tends{\rightarrow}
+	\def\into{\rightarrow}
+	\def\implies{\Rightarrow}
+	\def\half{\frac{1}{2}}
+	\def\quarter{\frac{1}{4}}
+	
+	\newcommand{\set}[1]{\left\{ #1 \right\}}
+	\newcommand{\norm}[1]{\left\Vert #1 \right\Vert}
+	\newcommand{\ip}[2]{\left\langle #1, #2 \right\rangle}
+	\newcommand{\card}[1]{\left\vert #1 \right\vert}
+	\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+	\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x 
+
+\end{abstract}
+
+\section{Uniform Convergence}
+
+\hspace{0.45cm}
+$\rightarrow$ We proved that H is PAC learnable iff VC-dimension of H is finite.
+
+$\rightarrow$ What more can one ask for?
+
+\hspace{0.90cm}
+1. Can we tolerate a non-zero in-sample error?
+
+\hspace{0.90cm}
+2. Can we use combination of simple (small VC-dimension) classifier?
+
+\hspace{0.90cm}
+3. Anything between d and d+1 for VC-dimension?
+
+\hspace{0.90cm}
+4. Boosting
+
+\subsection{Non-Zero In-Sample Error}
+
+\hspace{0.45cm}
+\textbf{Goal:} 
+\[
+P_{S \sim D^n} [\exists h \in H : |E_D(h,f) - E_S(h,f)| > \epsilon] \leq \delta
+\]
+\[
+\equiv P_{S \sim D^n} [ \cup_{h \in H} \, C_h ] \leq \delta
+\]
+\[
+(where \; C_h = |E_D(h,f) - E_S(h,f)| > \epsilon)
+\]
+
+\textbf{Step 1:} Fix an arbitrary $h \in H$
+
+Let $\mu = E_D[h,f]$ (a deterministic quantity)
+
+Let $X = E_S[h,f]$ (random variable)
+
+\hspace{1.1cm}
+$= (1/n)|{x \in S : h(x) \neq f(x)}|$
+
+\hspace{1.1cm}
+$= (1/n)(X_1 + X_2 + ... + X_n)$
+
+where, 
+\[
+X_i = 
+\begin{Bmatrix}
+1 & if \; h(x_i) \neq f(x_i)\\
+0 & o/w
+\end{Bmatrix}
+\]
+
+So X is a bernoulli random variable (0-1 random variable).
+
+$S = \{ x_1, ..., x_n \}$
+
+So X is the average of n independent bernoulli random variables.
+
+$E X = (1/n) \sum E X_i$
+
+\hspace{0.7cm}
+$= \sum P_{x_i \sim D} [h(x_i) \neq f(x_i)]$
+
+\hspace{0.7cm}
+$= (1/n) \sum E_D(h,f)$
+
+\hspace{0.7cm}
+$= (1/n) \sum \mu$
+
+\hspace{0.7cm}
+$= \mu = E_D(h,f)$
+
+Hence $C_h = |X - \mu_X| > \epsilon$
+
+\vspace{0.3cm}
+\textbf{Hoeffding Bounds:}
+
+Let $X_1, X_2, ..., X_n$ be independent $\{0,1\}$ random variables with $P(X_i = 1) = p = E X_i \; \forall i$ ($E X = (1/n) \sum E X_i = p$). Let $X = (1/n) (X_1 + ... + X_n), \, then$
+
+\hspace{0.5cm}
+(a) $P(X > p + \epsilon) \leq e^{- 2 \epsilon^2 n}$
+
+\hspace{0.5cm}
+(b) $P(X < p - \epsilon) \geq e^{- 2 \epsilon^2 n}$
+
+So $P[|X - p| > \epsilon] \leq 2 e^{- 2 \epsilon^2 n}$
+
+\vspace{0.3cm}
+Hence $P_{S \sim D^n} [ C_h ] \leq 2 e^{- 2 \epsilon^2 n}$
+
+\vspace{0.3cm}
+\textbf{Recall:}
+\[
+P_{S \sim D^n} [A_h] \leq (1 - \epsilon)^n \leq e^{- \epsilon n}
+\]
+\[
+A_h = (E_S(h,f) = 0) \wedge (E_D(h,f) > \epsilon)
+\]
+\[
+B_h = (E_S(h,f) = 0) \wedge (E_{S'}(h,f) > \epsilon / 2)
+\]
+
+\vspace{0.3cm}
+Now,
+\[
+C_h = |E_D(h,f) - E_S(h,f)| > \epsilon
+\]
+\[
+D_h = |E_{S'}(h,f) - E_S(h,f)| > \epsilon / 2
+\]
+
+\textbf{Claim:} $P(C_h / D_h) \geq 1/2$
+
+\textbf{Proof:} 
+
+Let $D'_{h} = |E_{S'}(h,f) - E_D(h,f)| \leq \epsilon / 2$
+
+Given $C_h$, $D'_h / C_h \implies D_h / C_h$
+
+$P(D_h / C_h) \geq P(D'_h / C_h)$
+
+\hspace{1.85cm}
+$\geq P(|X - \mu_X| \leq \epsilon / 2)$
+
+\hspace{1.85cm}
+$\geq 1 - 2 e^{- n \epsilon^2/2}$
+
+\hspace{1.85cm}
+$\geq 1/2 \; if \; n > 4 / \epsilon^2$
+
+Hence $P(D/C) \geq 1/2 \; when \; \; \; \; \; -(1)$
+\[
+D = \cup_{h \in H} D_h \; and \; C = \cup_{h \in H} C_h
+\]
+
+
+
+\begin{comment}
+%% Highlighter
+\mathcolorbox{yellow}{}
+
+%% Figure
+\begin{figure}[!h]
+\centering
+ \includegraphics[width=0.70\textwidth]{figure.png}
+ 
+ Fig a.b figure
+ \end{figure}
+\end{comment}
+
+\end{document}
